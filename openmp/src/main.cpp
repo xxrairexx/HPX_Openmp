@@ -1,15 +1,22 @@
-// Hello World en OpenMP (equivalente al ejemplo de GeeksforGeeks)
-// Compilar: g++ -std=c++17 -fopenmp hello_openmp.cpp -o hello_openmp
-// Ejecutar: ./hello_openmp
 #include <iostream>
 #include <omp.h>
-#include <cstdio>
 
 int main() {
-    #pragma omp parallel
+    constexpr int work_items = 16;
+
+    #pragma omp parallel for
+    for (int iteration = 0; iteration < work_items; ++iteration)
     {
-        // printf evita que las lineas se mezclen tanto como std::cout
-        std::printf("Hello World... from thread = %d\n", omp_get_thread_num());
+        int thread_id = omp_get_thread_num();
+        int total_threads = omp_get_num_threads();
+
+        #pragma omp critical
+        {
+            std::cout << "Hello World from iteration " << iteration
+                      << " on thread " << thread_id << " of " << total_threads
+                      << std::endl;
+        }
     }
+
     return 0;
 }
